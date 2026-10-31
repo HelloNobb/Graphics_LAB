@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Three.js로 배우는 실시간 그래픽스 — 기초부터 셰이더, 바다, 툰 셰이딩, 인스턴싱, 후처리까지 인터랙티브 데모와 한국어 설명" />
+    <meta name="theme-color" content="#0d0f13" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+    <title>그래픽스 실험실</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#content">본문으로 건너뛰기</a>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <button class="toc-toggle" type="button" aria-controls="toc" aria-expanded="false">목차</button>
+        <a class="brand" href="#top">
+          <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 10 52 21v22L32 54 12 43V21z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/><path d="M12 21l20 11 20-11M32 32v22" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round" opacity=".5"/></svg>
+          <span>그래픽스 실험실</span>
+        </a>
+        <span class="site-header__meta">Three.js · WebGL</span>
+      </div>
+    </header>
+
+    <div class="layout" id="top">
+      <nav class="toc" id="toc" aria-label="목차"></nav>
+      <div class="toc-backdrop" hidden></div>
+
+      <main id="content">
+        <section class="hero">
+          <p class="hero__eyebrow">Interactive Graphics Lab</p>
+          <h1>만지면서 배우는<br />실시간 3D 그래픽스</h1>
+          <p class="hero__lead">
+            씬과 카메라 같은 기본기부터 셰이더로 만드는 바다, 둥글게 휘는 세상, 툰 셰이딩, 풀밭 수만 개,
+            블룸 같은 후처리까지. 각 주제마다 <strong>개념 설명 → 직접 움직여 보는 데모 → 파라미터 조절</strong> 순서로 구성했습니다.
+          </p>
+          <ul class="hero__notes">
+            <li>데모는 화면에 보일 때만 실행되고, 지나가면 GPU 자원을 반납합니다.</li>
+            <li>오른쪽 위(모바일은 캔버스 아래) 패널에서 값을 바꿔 보세요. <kbd>↺ 기본값</kbd>으로 언제든 되돌릴 수 있습니다.</li>
+            <li>터치 기기에서는 캔버스를 <strong>한 번 탭해야</strong> 카메라를 돌릴 수 있습니다. 그 전에는 페이지가 정상적으로 스크롤됩니다.</li>
+          </ul>
+          <p class="hero__warn" hidden>이 브라우저는 WebGL2를 지원하지 않아 데모를 실행할 수 없습니다. 최신 Chrome, Safari, Firefox, Edge에서 열어 주세요.</p>
+        </section>
+        <div id="sections"></div>
+        <footer class="site-footer">
+          <p>그래픽스 실험실 · Three.js r186 · 모든 텍스처와 환경맵은 코드로 생성했습니다.</p>
+        </footer>
+      </main>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

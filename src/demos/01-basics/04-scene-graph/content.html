@@ -1,0 +1,23 @@
+<p><strong>씬 그래프</strong>는 물체들을 트리 구조로 묶는 방식입니다. 자식은 부모의 좌표계 안에 놓이기 때문에,
+<strong>부모가 움직이거나 회전하거나 커지면 자식도 함께 따라갑니다.</strong> 자식의 <code>position</code>은 부모 기준(로컬) 값입니다.</p>
+<pre><code>scene
+ └─ system (전체 크기 조절)
+     ├─ sun
+     └─ earthOrbit        ← 이것만 회전시키면 지구가 공전
+         └─ earthPivot (x = 4만큼 떨어짐)
+             ├─ earth     ← 자전
+             └─ moonOrbit ← 회전하면 달이 지구 주위를 공전
+                 └─ moon (x = 1.2)</code></pre>
+<p>지구 공전을 위해 지구의 좌표를 <code>cos</code>·<code>sin</code>으로 매번 계산할 필요가 없습니다. 빈 <code>Object3D</code>(피벗)를 원점에 두고 회전시키면 됩니다.
+달은 피벗 안의 피벗에 넣으면 "지구를 도는 달"이 됩니다. 최종 위치는 <strong>부모 행렬들을 차례로 곱한 월드 행렬</strong>로 결정됩니다
+(<code>달의 월드 행렬 = system · earthOrbit · earthPivot · moonOrbit · moon</code>).</p>
+<p>자동차 바퀴, 로봇 팔 관절, 캐릭터 뼈대(스켈레톤)처럼 실제로 자주 쓰는 구조입니다.</p>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>"전체 크기"를 바꾸면 태양, 지구, 달, 궤도가 한꺼번에 커집니다. 부모 하나의 scale만 바꾼 것입니다.</li>
+    <li>"달을 월드로 떼어내기"를 켜 보세요. <code>scene.attach(moon)</code>은 현재 월드 위치를 유지한 채 부모만 바꿉니다. 그 뒤로 달은 혼자 남습니다.</li>
+    <li>로컬 축을 켜고 지구 자전을 멈춘 뒤 공전만 보면, 피벗과 함께 축이 돌아가는 것이 보입니다.</li>
+  </ul>
+</div>
