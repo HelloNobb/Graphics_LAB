@@ -1,0 +1,19 @@
+<p><strong>원근 카메라(PerspectiveCamera)</strong>는 사람 눈이나 사진기처럼 <strong>멀리 있는 것을 작게</strong> 보여 줍니다. 보이는 공간은 앞이 잘린 피라미드 모양이고,
+이것을 <strong>절두체(frustum)</strong>라고 부릅니다. 주요 파라미터는 네 가지입니다.</p>
+<ul>
+  <li><code>fov</code>: 세로 시야각(도). 크면 광각(넓고 왜곡이 큼), 작으면 망원(좁고 납작함)</li>
+  <li><code>aspect</code>: 가로/세로 비율. 캔버스 크기가 바뀌면 반드시 갱신해야 그림이 찌그러지지 않음</li>
+  <li><code>near</code>, <code>far</code>: 이보다 가깝거나 먼 것은 그리지 않음. 둘의 비율이 너무 크면 깊이 정밀도가 부족해 면이 깜빡이는 <em>z-fighting</em>이 생김</li>
+</ul>
+<p><strong>직교 카메라(OrthographicCamera)</strong>는 보이는 공간이 <strong>직육면체</strong>입니다. 거리에 따라 크기가 변하지 않고 평행선이 끝까지 평행하게 유지됩니다.
+그래서 설계 도면, 아이소메트릭 게임, 2D UI, 그림자 계산(방향광)에 씁니다. 카메라를 앞뒤로 움직여도 크기가 그대로이므로, 확대·축소는 <code>zoom</code>이나 left/right/top/bottom 값으로 합니다.</p>
+<p class="note">이 데모는 렌더러 하나로 화면을 좌우로 나눠 두 번 그립니다(<code>setViewport</code> + <code>setScissor</code>). 한 캔버스에 여러 시점을 그리는 기본 기법입니다.</p>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>FOV를 100 이상으로 키우면 가장자리 기둥이 늘어나는 광각 왜곡이 보입니다. 15로 줄이면 오른쪽 직교 화면과 거의 비슷해집니다.</li>
+    <li>"돌리 줌"을 켜 보세요. 가운데 큐브 크기는 그대로인데 배경만 늘었다 줄었다 합니다. 영화 '현기증'에 나온 촬영 기법입니다.</li>
+    <li>"관찰자 시점"에서 near/far를 바꾸면 절두체의 앞면과 뒷면이 움직입니다. 그 밖에 있는 물체는 잘려서 그려지지 않습니다.</li>
+  </ul>
+</div>

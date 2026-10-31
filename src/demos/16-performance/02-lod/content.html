@@ -1,0 +1,20 @@
+<p>화면 구석에 손톱만 하게 보이는 바위를 삼각형 3,000개로 그릴 필요는 없습니다. 픽셀 몇 개를 덮는 데 삼각형 수천 개를 쓰면 낭비입니다.
+<strong>LOD(Level of Detail)</strong>는 같은 물체를 디테일이 다른 여러 버전으로 준비해 두고, <strong>카메라와의 거리</strong>에 따라 바꿔 그리는 기법입니다.</p>
+<pre><code>const lod = new THREE.LOD();
+lod.addLevel(highMesh, 0);    // 0 ~ 12m: 고해상도 (삼각형 3,000)
+lod.addLevel(midMesh, 12);    // 12 ~ 28m: 중간 (삼각형 360)
+lod.addLevel(lowMesh, 28);    // 28m~ : 저해상도 (삼각형 40)
+scene.add(lod);               // 렌더러가 매 프레임 거리를 재서 하나만 그림</code></pre>
+<p>전환 경계에서 카메라가 조금씩 움직이면 모델이 왔다 갔다 바뀌며 깜빡일 수 있습니다(popping). <code>addLevel</code>의 세 번째 인자 <strong>hysteresis</strong>는 전환 거리에 여유를 주어 이를 줄입니다.</p>
+<h4>절두체 컬링 (Frustum Culling)</h4>
+<p>카메라 뒤나 옆처럼 <strong>화면 밖에 있는 물체는 아예 그리지 않는 것</strong>입니다. Three.js는 각 물체의 바운딩 구가 카메라 절두체와 겹치는지 검사하며, 기본으로 켜져 있습니다(<code>frustumCulled = true</code>).
+드로우콜과 삼각형 수를 크게 줄이지만, 셰이더에서 정점을 크게 옮기는 물체(바다, 둥근 세상, 파티클)는 바운딩 구가 실제와 달라 잘못 컬링될 수 있습니다. 앞 장들에서 그런 물체만 꺼 둔 이유입니다.</p>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>LOD를 끄면 모든 구가 고해상도로 그려집니다. 오른쪽 아래 삼각형 수가 몇 배로 뛰는 것을 확인하세요. 화면상 차이는 거의 없습니다.</li>
+    <li>frustumCulled를 끄면 화면 밖 물체까지 그려서 드로우콜이 전체 개수와 같아집니다.</li>
+    <li>"레벨 색 표시"를 켜고 경계 거리 슬라이더를 움직여 보세요. 색 띠가 카메라를 중심으로 동심원처럼 이동합니다.</li>
+  </ul>
+</div>

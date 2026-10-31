@@ -1,0 +1,31 @@
+<p><code>InstancedMesh</code>는 지오메트리 하나와 재질 하나, 그리고 <strong>인스턴스마다의 변환 행렬 배열</strong>을 갖습니다.
+GPU는 같은 정점 데이터를 N번 반복하면서 매번 다른 <code>instanceMatrix</code>를 적용합니다.</p>
+<pre><code>const grass = new THREE.InstancedMesh(bladeGeometry, grassMaterial, 50000);
+const m = new THREE.Matrix4();
+for (let i = 0; i &lt; 50000; i++) {
+  m.compose(randomPosition(), randomYRotation(), randomScale());
+  grass.setMatrixAt(i, m);
+}
+scene.add(grass); // → 드로우콜 1회</code></pre>
+<h4>바람은 버텍스 셰이더로</h4>
+<p>풀잎 5만 개의 행렬을 매 프레임 CPU에서 고치면 그것만으로 느려집니다. 그래서 행렬은 처음 한 번만 정하고, <strong>흔들림은 버텍스 셰이더가 계산</strong>합니다.</p>
+<ol>
+  <li>풀잎 뿌리의 월드 위치로 <strong>2D 노이즈</strong>를 읽습니다. 노이즈를 시간에 따라 바람 방향으로 흘려보내면 바람결이 들판을 쓸고 지나가는 것처럼 보입니다.</li>
+  <li>정점 높이 h(뿌리 0 ~ 끝 1)의 <strong>제곱에 비례해</strong> 휘게 합니다. 뿌리는 땅에 고정되고 끝으로 갈수록 크게 휩니다.</li>
+  <li>휜 만큼 높이를 살짝 낮춰 풀잎이 늘어나지 않게 합니다.</li>
+</ol>
+<pre><code>vec3 root = (modelMatrix * instanceMatrix * vec4(0, 0, 0, 1)).xyz;
+float gust = snoise(root.xz * 0.06 - uWindDir * uTime * uSpeed) * 0.5 + 0.5;
+float bend = (gust * uStrength + sin(uTime * 3.0 + root.x) * 0.05) * h * h;
+worldPos.xz += uWindDir * bend;
+worldPos.y  -= bend * bend * 0.5;</code></pre>
+<p>색도 셰이더에서 정합니다. 뿌리는 어둡고 끝은 밝게 칠하고, 인스턴스마다 위치 기반 무작위 값으로 색을 조금씩 바꿔 단조로움을 없앱니다.</p>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>개수를 20만까지 올려 보세요. 드로우콜은 그대로이고, 삼각형 수만 늘어납니다.</li>
+    <li>바람 방향을 돌리면 바람결 무늬가 그 방향으로 흐릅니다.</li>
+    <li>바람 세기를 0으로 두면 풀밭이 사진처럼 멈춥니다. 바람 계산은 정점마다 하는 노이즈 한 번이 전부입니다.</li>
+  </ul>
+</div>

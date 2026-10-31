@@ -1,0 +1,20 @@
+<p>현실에서 먼 산이 뿌옇고 푸르게 보이는 이유는 공기 중의 입자가 빛을 산란시키기 때문입니다(공기 원근법). 실시간 그래픽스의 <strong>안개</strong>는 이것을 아주 단순하게 흉내 냅니다.
+각 픽셀의 <strong>카메라와의 거리 d</strong>에 따라 원래 색과 안개색을 섞을 뿐입니다.</p>
+<table>
+  <tr><th>종류</th><th>섞는 비율(안개 정도)</th><th>느낌</th></tr>
+  <tr><td><code>THREE.Fog(color, near, far)</code></td><td><code>smoothstep(near, far, d)</code>: near까지는 맑고, far에서 완전히 안개</td><td>범위를 정확히 제어할 수 있습니다. 게임에서 "시야 거리"를 숨기는 데 좋습니다.</td></tr>
+  <tr><td><code>THREE.FogExp2(color, density)</code></td><td><code>1 − exp(−(density·d)²)</code></td><td>현실의 대기처럼 가까이서부터 서서히 짙어집니다.</td></tr>
+</table>
+<pre><code>scene.fog = new THREE.FogExp2('#c9d6e8', 0.03);
+scene.background = new THREE.Color('#c9d6e8'); // 배경과 같은 색으로!</code></pre>
+<p>계산은 각 재질의 셰이더 마지막 단계에서 이루어지고(<code>fog: true</code>가 기본), 비용은 거의 들지 않습니다. 안개 너머의 물체는 <code>camera.far</code>로 잘라 버리면
+그리는 비용까지 아낄 수 있습니다. 안개가 그 경계를 가려 주기 때문입니다.</p>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>Fog에서 near와 far를 가깝게 붙이면 벽을 친 듯 갑자기 안개가 시작됩니다. 서로 멀리 떨어뜨리면 자연스러워집니다.</li>
+    <li>FogExp2의 density를 0.08로 올려 보세요. 짙은 새벽 안개가 됩니다.</li>
+    <li>안개색을 주황으로 바꾸면 노을이나 모래폭풍 분위기가 납니다.</li>
+  </ul>
+</div>

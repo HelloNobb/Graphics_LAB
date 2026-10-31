@@ -1,0 +1,24 @@
+<h4>① 명암 계단: gradientMap</h4>
+<p>일반 셰이딩은 밝기 <code>N·L</code>(0~1)을 그대로 씁니다. 툰 셰이딩은 이 값을 <strong>몇 개 구간으로 양자화</strong>합니다.
+<code>MeshToonMaterial</code>은 <code>gradientMap</code>이라는 작은 텍스처(예: 가로 3픽셀)를 받아 <code>N·L</code>을 좌표로 써서 색을 찾습니다.
+<code>NearestFilter</code>로 두면 픽셀 사이가 보간되지 않아 경계가 칼같이 끊깁니다.</p>
+<pre><code>const steps = new Uint8Array([60, 160, 255]);           // 어두움 / 중간 / 밝음
+const gradientMap = new THREE.DataTexture(steps, 3, 1, THREE.RedFormat);
+gradientMap.minFilter = gradientMap.magFilter = THREE.NearestFilter;
+const mat = new THREE.MeshToonMaterial({ color: '#ff8a65', gradientMap });</code></pre>
+<p>여기에 시선과 노멀이 거의 수직인 가장자리를 밝게 칠하는 <strong>림 라이트</strong>(<code>1 − N·V</code>를 계단화)를 더하면 애니메이션 느낌이 더 납니다. 이 데모는 <code>onBeforeCompile</code>로 넣었습니다.</p>
+<h4>② 외곽선 방법 A: 반전 헐 (Inverted Hull)</h4>
+<p>같은 모양을 <strong>노멀 방향으로 조금 부풀려</strong> 하나 더 그리되, <strong>뒷면만</strong>(<code>side: BackSide</code>) 검게 칠합니다. 앞쪽은 원래 물체가 가리고, 테두리로 삐져나온 부분만 선처럼 보입니다.
+게임에서 가장 많이 쓰는 방식이고 아주 쌉니다. 다만 노멀이 면마다 갈라진 <strong>각진 모서리</strong>(상자)에서는 부풀린 면들이 벌어져 선이 끊깁니다.</p>
+<h4>③ 외곽선 방법 B: 후처리 엣지 검출</h4>
+<p>씬을 한 번 그린 뒤 화면 이미지에서 <strong>깊이나 노멀이 급격히 바뀌는 픽셀</strong>을 찾아(Sobel 필터) 칠합니다. 물체 바깥뿐 아니라 <strong>겹친 물체 사이, 접힌 면</strong>에도 선이 생기고
+모서리 문제도 없습니다. 대신 화면 전체를 한 번 더 처리하는 비용이 들고, 선 두께가 픽셀 단위입니다(15장 포스트프로세싱과 같은 구조입니다).</p>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>단계 수를 2로 두면 그림자/빛만 있는 강한 만화풍이 되고, 5 이상이면 점점 일반 셰이딩에 가까워집니다.</li>
+    <li>반전 헐의 두께를 키우고 상자 모서리를 확대해 보세요. 선이 벌어지는 것이 보입니다. 후처리 방식으로 바꾸면 해결됩니다.</li>
+    <li>"셰이딩 비교"를 일반(Standard)으로 바꾸면 같은 장면이 사실적으로 보입니다.</li>
+  </ul>
+</div>

@@ -1,0 +1,28 @@
+<p><strong>환경맵</strong>은 한 지점에서 주변 전체(위, 아래, 앞, 뒤, 좌, 우)를 담은 이미지입니다. 큐브의 6면에 저장하는 <strong>큐브맵</strong>이나,
+세계지도처럼 펼친 파노라마(equirectangular, 보통 HDR 파일)로 만듭니다. 반사를 계산할 때는 눈에서 표면으로 온 시선을 노멀 기준으로 꺾은
+<strong>반사 벡터 R</strong>을 구하고, 그 방향의 환경맵 색을 가져옵니다.</p>
+<p class="formula">R = reflect(-V, N) &nbsp;→&nbsp; color = envMap(R)</p>
+<p>거친 표면은 반사가 흐려야 하므로, 환경맵을 거칠기 단계별로 미리 흐려 둔 <strong>PMREM</strong>을 씁니다. Standard 재질은 roughness에 맞는 단계를 골라 읽습니다.</p>
+<table>
+  <tr><th>방식</th><th>설명</th></tr>
+  <tr><td>정적 환경맵</td><td>미리 준비한 이미지입니다(여기서는 Three.js의 <code>RoomEnvironment</code> 스튜디오). 매우 싸지만 움직이는 주변 물체는 비치지 않습니다.</td></tr>
+  <tr><td><code>CubeCamera</code></td><td>물체 위치에서 6방향으로 씬을 <strong>매 프레임 직접 렌더링</strong>해 큐브맵을 만듭니다. 주변 변화가 실시간으로 비치지만 씬을 6번 더 그려서 비쌉니다.</td></tr>
+</table>
+<pre><code>const cubeRT = new THREE.WebGLCubeRenderTarget(256);
+const cubeCamera = new THREE.CubeCamera(0.1, 100, cubeRT);
+sphere.material.envMap = cubeRT.texture;
+
+// 매 프레임: 자기 자신이 찍히지 않게 숨기고 6면 촬영
+sphere.visible = false;
+cubeCamera.position.copy(sphere.position);
+cubeCamera.update(renderer, scene);
+sphere.visible = true;</code></pre>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>CubeCamera 모드에서 드로우콜 수를 정적 모드와 비교해 보세요. 6면을 더 그리는 비용이 보입니다.</li>
+    <li>CubeCamera 해상도를 16으로 내리면 반사가 뭉개집니다. 거친 재질이라면 낮은 해상도로도 충분하다는 뜻입니다.</li>
+    <li>거칠기를 0에서 0.6까지 올려 보세요. PMREM 덕분에 반사가 자연스럽게 흐려집니다.</li>
+  </ul>
+</div>

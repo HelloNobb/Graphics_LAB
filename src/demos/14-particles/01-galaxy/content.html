@@ -1,0 +1,23 @@
+<p>은하는 <strong>위치를 만드는 규칙</strong>만 잘 정하면 됩니다.</p>
+<ol>
+  <li>중심에서의 거리 r을 무작위로 고르고, 점을 <code>branches</code>개의 나선 팔 중 하나에 배치합니다.</li>
+  <li>멀리 있는 점일수록 더 많이 비틀어(<code>spin × r</code>) 나선을 만듭니다.</li>
+  <li>팔에서 조금씩 흩뿌립니다. 무작위 값을 <code>randomnessPower</code>제곱하면 대부분 팔 근처에 모이고 일부만 멀리 퍼집니다.</li>
+  <li>색은 r에 따라 안쪽 색에서 바깥 색으로 섞습니다(정점 색 <code>color</code> 속성).</li>
+</ol>
+<p>렌더링에서 중요한 설정은 세 가지입니다.</p>
+<ul>
+  <li><strong><code>blending: AdditiveBlending</code></strong>: 겹친 점의 색을 <em>더합니다.</em> 별이 많이 모인 중심부가 자연스럽게 밝게 타오릅니다.</li>
+  <li><strong><code>depthWrite: false</code></strong>: 반투명한 점끼리 깊이 버퍼로 서로를 가리지 않게 합니다. 이걸 빼면 점 주위에 검은 사각형이 생깁니다.</li>
+  <li><strong>크기 감쇠</strong>: 셰이더에서 <code>gl_PointSize = size / -viewZ</code>로 멀수록 작게 그립니다. <code>gl_PointCoord</code>(점 안의 0~1 좌표)로 가운데가 밝은 동그라미를 그립니다.</li>
+</ul>
+<p>회전은 CPU에서 위치를 고치지 않고 버텍스 셰이더에서 <code>angle += uTime / r</code>로 처리합니다. 실제 은하처럼 <strong>안쪽이 더 빨리 도는</strong> 차등 회전입니다.</p>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>branches를 2로, spin을 3으로 바꿔 보세요. 막대 나선은하 느낌이 납니다.</li>
+    <li>randomnessPower를 1로 낮추면 점이 고르게 퍼져서 팔 모양이 흐려집니다.</li>
+    <li>시간 속도를 올려 오래 두면 차등 회전 때문에 팔이 점점 더 감깁니다.</li>
+  </ul>
+</div>

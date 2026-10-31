@@ -1,0 +1,25 @@
+<p><code>BufferGeometry</code>는 정점마다 여러 <strong>속성(attribute)</strong>을 배열로 갖고 있습니다. 직접 만들어 보면 구조가 잘 보입니다.</p>
+<pre><code>const geo = new THREE.BufferGeometry();
+geo.setAttribute('position', new THREE.Float32BufferAttribute([
+  -1, -1, 0,   1, -1, 0,   -1, 1, 0,   1, 1, 0,   // 정점 4개 (x,y,z)
+], 3));
+geo.setAttribute('normal', new THREE.Float32BufferAttribute([
+  0, 0, 1,  0, 0, 1,  0, 0, 1,  0, 0, 1,          // 모두 +Z(나를 향함)
+], 3));
+geo.setIndex([0, 1, 2,  2, 1, 3]);                // 삼각형 2개가 정점을 공유</code></pre>
+<p><strong>인덱스(index)</strong>는 "몇 번 정점 3개로 삼각형을 만들지"를 적은 목록입니다. 인접한 삼각형이 정점을 공유하므로 메모리를 아낄 수 있습니다.</p>
+<p><strong>노멀(normal)</strong>은 표면이 바라보는 방향을 나타내는 길이 1의 벡터입니다. 조명 계산은 "빛이 오는 방향과 노멀이 얼마나 나란한가"로 밝기를 정하므로, 노멀이 곧 음영을 결정합니다.</p>
+<ul>
+  <li><strong>smooth</strong>: 이웃한 삼각형들이 정점을 공유하고, 노멀은 주변 면 방향의 평균입니다. 면과 면 사이에서 밝기가 부드럽게 이어집니다.</li>
+  <li><strong>flat</strong>: 삼각형마다 정점을 따로 갖고(정점 수가 늘어남), 노멀이 면에 수직입니다. 각진 로우폴리 느낌이 납니다.</li>
+</ul>
+<p>정점 노멀은 <code>geometry.computeVertexNormals()</code>로 자동 계산할 수 있습니다. 같은 위치의 정점을 공유하는지 아닌지가 smooth와 flat을 가릅니다.</p>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>"박스"를 smooth로 보세요. 모서리 정점을 공유해 노멀이 대각선 방향으로 평균나므로, 각진 상자가 둥글게 번진 듯 보입니다. 실제 BoxGeometry는 그래서 면마다 정점을 따로 둡니다(24개).</li>
+    <li>울퉁불퉁 변위를 올린 뒤 flat과 smooth를 비교해 보세요. 왼쪽 위의 정점 수도 함께 바뀝니다.</li>
+    <li>"직접 만든 사각형"에서 인덱스 덕분에 정점 4개로 삼각형 2개를 만드는 것을 확인하세요.</li>
+  </ul>
+</div>

@@ -1,0 +1,20 @@
+<table>
+  <tr><th>조명</th><th>현실 비유</th><th>특징</th></tr>
+  <tr><td><code>AmbientLight</code></td><td>사방에서 오는 반사광</td><td>방향이 없어 모든 면을 똑같이 밝힙니다. 이것만 있으면 입체감이 사라집니다. 그림자가 너무 새까맣지 않게 바닥값을 깔아 주는 용도입니다.</td></tr>
+  <tr><td><code>HemisphereLight</code></td><td>하늘 + 땅 반사</td><td>위를 향한 면은 하늘색, 아래를 향한 면은 땅색을 받습니다. 야외 장면의 바탕 조명으로 Ambient보다 훨씬 자연스럽습니다.</td></tr>
+  <tr><td><code>DirectionalLight</code></td><td>태양</td><td>무한히 멀리 있어 모든 광선이 평행합니다. 위치와 상관없이 <strong>방향</strong>만 의미가 있고, 거리에 따라 약해지지 않습니다.</td></tr>
+  <tr><td><code>PointLight</code></td><td>전구</td><td>한 점에서 모든 방향으로 퍼집니다. 거리가 멀어질수록 약해집니다(<code>decay</code>=2가 물리적으로 맞는 역제곱 법칙).</td></tr>
+  <tr><td><code>SpotLight</code></td><td>무대 조명, 손전등</td><td>원뿔 모양으로 비춥니다. <code>angle</code>은 원뿔 각도, <code>penumbra</code>는 가장자리가 흐려지는 정도입니다.</td></tr>
+</table>
+<p>조명이 늘어날수록 모든 픽셀이 조명 수만큼 계산을 반복하므로 느려집니다. 실제 게임은 "바탕(Hemisphere) + 주광(Directional) + 꼭 필요한 몇 개의 점광원" 정도로 구성하고,
+나머지는 텍스처에 미리 구워 두거나(라이트맵) 환경맵으로 대신합니다.</p>
+<p class="note">Three.js r155부터 빛의 세기는 물리 단위(칸델라, 럭스)를 따릅니다. 점광원이나 스포트라이트는 <code>intensity</code>가 수십~수백은 돼야 밝아 보이는 것이 정상입니다.</p>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>Ambient만 켜 보세요. 모든 면이 같은 밝기라 물체가 종이를 오려 붙인 것처럼 보입니다.</li>
+    <li>Hemisphere만 켠 뒤 하늘색과 땅색을 바꿔 보세요. 물체의 윗면과 아랫면 색이 달라집니다.</li>
+    <li>Spot의 penumbra를 0과 1로 바꿔 경계가 날카로워졌다 부드러워지는 것을 보세요. Point의 decay를 0으로 두면 거리가 멀어져도 어두워지지 않습니다.</li>
+  </ul>
+</div>

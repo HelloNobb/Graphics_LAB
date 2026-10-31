@@ -1,0 +1,21 @@
+<p>텍스처 이미지의 가로를 <strong>U</strong>, 세로를 <strong>V</strong>라고 하고 둘 다 <strong>0~1 범위</strong>로 정규화합니다. 이미지가 512px이든 4096px이든
+왼쪽 아래가 (0, 0), 오른쪽 위가 (1, 1)입니다.</p>
+<p>지오메트리의 각 정점에는 "이 정점은 이미지의 어느 지점에 해당하는가"를 적은 <code>uv</code> 속성이 있습니다. 삼각형 내부의 픽셀은 세 정점의 UV를 보간해서 텍스처의 해당 위치 색을 가져옵니다.
+3D 표면을 2D 이미지 위에 펼쳐 놓는 작업을 <strong>UV 언래핑</strong>이라고 하며, 지구본을 세계지도로 펼치는 것과 같습니다.</p>
+<pre><code>const tex = new THREE.TextureLoader().load('grid.png');
+tex.colorSpace = THREE.SRGBColorSpace; // 색상 텍스처는 sRGB로 지정
+tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+tex.repeat.set(2, 2);    // 2번 반복 (UV × 2)
+tex.offset.set(0.1, 0);  // 밀기
+tex.rotation = Math.PI / 8; tex.center.set(0.5, 0.5);</code></pre>
+<p><code>repeat</code>, <code>offset</code>, <code>rotation</code>은 지오메트리를 바꾸지 않습니다. 셰이더에서 UV에 변환 행렬을 곱하는 것입니다.</p>
+<p class="note">구의 극지방에서 칸이 좁게 모이고, 세로로 이음새(seam)가 하나 생기는 것을 보세요. 둥근 면을 평면 지도로 펼칠 때 생기는 왜곡입니다. 세계지도에서 그린란드가 커 보이는 것과 같은 이유입니다.</p>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>박스를 고르면 6면이 각각 0~1 전체 UV를 씁니다. 모든 면에 A1~H8 전체가 보입니다.</li>
+    <li>"UV를 색으로 보기"를 켜면 왼쪽 아래(0,0)는 검정, 오른쪽 아래는 빨강, 왼쪽 위는 초록, 오른쪽 위는 노랑입니다. 셰이더 디버깅에 자주 쓰는 방법입니다.</li>
+    <li>repeat를 3으로 올리고 rotation을 돌려 보세요.</li>
+  </ul>
+</div>

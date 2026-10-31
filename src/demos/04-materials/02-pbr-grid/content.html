@@ -1,0 +1,21 @@
+<p>물리 기반 렌더링(PBR)은 "현실의 재료는 대부분 <strong>두 개의 숫자</strong>로 설명된다"는 관찰에서 출발합니다.</p>
+<ul>
+  <li><strong>roughness(거칠기, 0~1)</strong>: 표면의 미세한 요철 정도입니다. 0이면 거울처럼 선명하게 반사하고, 1이면 반사가 넓게 퍼져 무광이 됩니다.</li>
+  <li><strong>metalness(금속성, 0~1)</strong>: 0은 플라스틱, 나무, 돌 같은 <em>비금속</em>으로, 기본색이 난반사로 보이고 반사광은 흰색입니다.
+  1은 <em>금속</em>으로, 난반사가 없고 반사광 자체가 기본색으로 물듭니다(금은 노랗게, 구리는 붉게 반사). 실제 재료는 대부분 0 아니면 1입니다.</li>
+</ul>
+<p>금속은 거의 모든 빛을 반사로 내보내므로 <strong>반사할 주변 환경</strong>이 없으면 새까맣게 보입니다. 그래서 PBR에는 <strong>환경맵(environment map)</strong>이 사실상 필수입니다.
+<code>scene.environment</code>에 환경맵을 지정하면 모든 Standard/Physical 재질이 그것을 반사하고, 그 빛으로 은은하게 조명됩니다(Image Based Lighting).</p>
+<pre><code>const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment()).texture;</code></pre>
+<p><code>MeshPhysicalMaterial</code>은 Standard의 확장판입니다. <strong>clearcoat</strong>(자동차 도장처럼 위에 덮인 투명 코팅층), 투과, 광택천(sheen) 같은 효과를 더할 수 있습니다.
+이 데모의 구는 모두 Physical 재질이며, clearcoat가 0이면 Standard와 결과가 같습니다.</p>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>환경맵을 끄고 방향광만 남겨 보세요. 위쪽(금속) 줄이 거의 검게 변합니다.</li>
+    <li>clearcoat를 1로 올리면 거칠고 무광인 오른쪽 구들 위에도 선명한 코팅 반사가 한 겹 생깁니다.</li>
+    <li>기본 색을 금색(#ffc35a)으로 바꾸고 맨 윗줄을 보세요. 금속만 반사광이 노랗게 물듭니다.</li>
+  </ul>
+</div>

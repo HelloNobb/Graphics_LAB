@@ -1,0 +1,17 @@
+<p>Three.js에는 자주 쓰는 모양을 만들어 주는 지오메트리 클래스가 준비되어 있습니다. 대부분 <strong>크기</strong>와 <strong>분할 수(segments)</strong>를 인자로 받습니다.</p>
+<pre><code>new THREE.BoxGeometry(width, height, depth, wSeg, hSeg, dSeg);
+new THREE.SphereGeometry(radius, widthSegments, heightSegments);
+new THREE.TorusKnotGeometry(radius, tube, tubularSegments, radialSegments);
+new THREE.LatheGeometry(points, segments); // 2D 윤곽을 회전시켜 만드는 도자기형</code></pre>
+<p><strong>분할 수가 많을수록 곡면이 매끈해지지만 정점과 삼각형이 늘어납니다.</strong> 구의 분할을 2배로 늘리면 삼각형은 약 4배가 됩니다.
+화면에서 작게 보이는 물체에 수만 개의 삼각형을 쓰면 낭비이므로, 필요한 만큼만 쓰는 감각이 중요합니다(16장 LOD에서 다시 다룹니다).</p>
+<p>모든 지오메트리는 내부적으로 <code>BufferGeometry</code>입니다. 정점 데이터를 <code>Float32Array</code> 같은 연속된 배열(버퍼)로 갖고 있다가 GPU 메모리에 한 번에 올립니다.</p>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>구의 분할 A를 3, B를 2로 낮춰 보세요. 구가 아니라 다면체가 됩니다. 원래 곡면이 "근사"였다는 뜻입니다.</li>
+    <li>flatShading을 켜면 삼각형 하나하나가 각지게 보입니다. 이 차이는 다음 데모의 노멀에서 나옵니다.</li>
+    <li>Lathe(도자기)를 골라 보세요. 2D 곡선 하나를 회전시켜 만든 모양입니다.</li>
+  </ul>
+</div>

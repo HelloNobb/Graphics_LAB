@@ -1,0 +1,26 @@
+<p><code>OrbitControls</code>는 카메라를 <strong>한 점(target)을 중심으로 공전</strong>시키는 조작기입니다. 카메라 위치를 구면 좌표(거리, 위아래 각도, 좌우 각도)로 다루기 때문에
+"물체 주변을 빙글빙글 돌며 보기"가 아주 쉬워집니다.</p>
+<pre><code>import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;   // 관성: 손을 놓아도 부드럽게 멈춤
+controls.target.set(0, 1, 0);    // 바라볼 중심
+
+// 렌더 루프 안에서 (damping이나 autoRotate를 쓰면 반드시 호출)
+controls.update(dt);</code></pre>
+<ul>
+  <li><strong>damping</strong>: 감쇠(관성). <code>dampingFactor</code>가 작을수록 오래 미끄러집니다.</li>
+  <li><strong>min/maxDistance</strong>: 줌 한계입니다. 물체 속으로 파고들거나 너무 멀어지는 것을 막습니다.</li>
+  <li><strong>min/maxPolarAngle</strong>: 위아래 회전 한계입니다. 0°는 바로 위, 90°는 수평입니다. 최대를 90°보다 조금 작게 두면 바닥 밑으로 내려가지 않습니다.</li>
+  <li><strong>enablePan</strong>: target 자체를 옮기는 이동(팬) 허용 여부입니다.</li>
+</ul>
+<p class="note">모바일에서는 캔버스가 터치를 가로채면 페이지 스크롤이 막힙니다. 그래서 이 사이트는 "탭해서 조작"을 눌러야 컨트롤이 켜지도록 했습니다.
+데스크톱에서는 페이지를 휠로 내리다가 갑자기 줌되지 않도록 캔버스를 한 번 클릭해야 휠 줌이 켜집니다.</p>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>"최대 극각"을 85°로 두면 카메라가 땅 밑으로 내려가지 않습니다. 대부분의 3D 뷰어가 쓰는 설정입니다.</li>
+    <li>damping을 끄고 드래그해 보세요. 손을 떼는 순간 딱 멈춰서 딱딱한 느낌이 납니다.</li>
+    <li>"거리 한계 표시"를 켜면 min/maxDistance가 구로 보입니다. 카메라는 두 구 사이에서만 움직입니다.</li>
+  </ul>
+</div>

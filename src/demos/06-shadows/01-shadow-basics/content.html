@@ -1,0 +1,26 @@
+<p>섀도우 맵은 <strong>두 번 그리기</strong>로 그림자를 만듭니다.</p>
+<ol>
+  <li><strong>광원의 시점에서</strong> 씬을 한 번 그립니다. 이때 색은 버리고 각 픽셀까지의 <strong>거리(깊이)</strong>만 텍스처에 저장합니다. 이 텍스처가 섀도우 맵이고, "빛이 닿은 가장 가까운 표면"의 지도입니다.</li>
+  <li>카메라 시점에서 실제로 그릴 때, 각 픽셀을 광원 좌표로 변환해 섀도우 맵의 값과 비교합니다. <strong>내 거리가 지도에 적힌 거리보다 멀면</strong> 나보다 앞에 무언가가 빛을 막고 있다는 뜻이므로 그림자입니다.</li>
+</ol>
+<pre><code>renderer.shadowMap.enabled = true;     // 1) 렌더러에서 켜기
+light.castShadow = true;               // 2) 그림자를 만드는 광원
+mesh.castShadow = true;                // 3) 그림자를 드리우는 물체
+floor.receiveShadow = true;            // 4) 그림자를 받는 물체</code></pre>
+<p>네 가지 중 하나라도 빠지면 그림자가 안 보이는데, 처음 쓸 때 가장 자주 하는 실수입니다. 광원마다 섀도우 맵을 그리는 비용이 추가로 들기 때문에 기본값이 꺼져 있습니다.
+특히 <strong>점광원은 모든 방향을 봐야 해서 6번</strong>(큐브맵의 6면) 그립니다.</p>
+<table>
+  <tr><th>섀도우 타입</th><th>설명</th></tr>
+  <tr><td><code>BasicShadowMap</code></td><td>한 번만 비교합니다. 가장 빠르지만 경계가 계단처럼 딱딱합니다.</td></tr>
+  <tr><td><code>PCFShadowMap</code> (기본)</td><td>주변 여러 텍셀과 비교해 평균을 냅니다(Percentage-Closer Filtering). 경계가 부드럽고 <code>radius</code>로 흐림 정도를 조절합니다.</td></tr>
+  <tr><td><code>VSMShadowMap</code></td><td>깊이의 평균과 분산을 저장해 넓게 흐린 그림자를 만듭니다. 부드럽지만 그림자가 겹친 곳에 빛이 새는 현상이 생길 수 있습니다.</td></tr>
+</table>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>"그림자 카메라 표시"를 켜 보세요. 방향광은 직육면체(직교 카메라), 스포트라이트는 원뿔(원근 카메라) 범위만 섀도우 맵에 담깁니다.</li>
+    <li>점광원으로 바꾸고 오른쪽 아래 드로우콜 수를 보세요. 그림자 패스가 6면이라 크게 늘어납니다.</li>
+    <li>"바닥 receiveShadow"를 끄면 바닥 그림자는 사라지지만, 물체끼리 서로에게 드리우는 그림자는 남습니다.</li>
+  </ul>
+</div>

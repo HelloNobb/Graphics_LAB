@@ -1,0 +1,28 @@
+<p>버텍스 셰이더는 정점 하나를 받아 <strong>최종 화면 위치</strong>를 계산합니다. 기본형은 행렬 세 개를 곱하는 것입니다.</p>
+<pre><code>// vertex shader
+uniform float uTime, uAmp, uFreq;
+varying float vDisp;
+
+void main() {
+  // 노멀 방향으로 sin 파동만큼 밀어내기
+  float d = sin(position.y * uFreq + uTime) * uAmp;
+  vec3 p = position + normal * d;
+  vDisp = d;   // 프래그먼트 셰이더로 전달 → 색칠에 사용
+
+  gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(p, 1.0);
+  //            ↑ 원근 투영       ↑ 카메라 기준  ↑ 월드 배치
+}</code></pre>
+<p><code>position</code>, <code>normal</code>, <code>uv</code> 같은 지오메트리 속성과 <code>modelMatrix</code>, <code>viewMatrix</code>, <code>projectionMatrix</code>는 <code>ShaderMaterial</code>이 자동으로 넣어 줍니다
+(전부 직접 선언하려면 <code>RawShaderMaterial</code>을 씁니다). CPU에서 정점 8만 개를 매 프레임 수정해 다시 올리는 대신 GPU가 병렬로 계산하므로 아주 빠릅니다.
+바다, 풀, 깃발, 둥근 세상 같은 다음 장의 효과가 모두 이 원리입니다.</p>
+<p class="note"><strong>함정:</strong> 정점을 움직여도 <code>normal</code> 속성은 원래 구의 노멀 그대로입니다. 그래서 조명이 이상해집니다.
+해결법은 ① 변형 공식을 미분해 새 노멀을 계산하거나(10장 바다), ② 프래그먼트 셰이더에서 <code>dFdx</code>/<code>dFdy</code>로 이웃 픽셀 위치 차이를 구해 면 방향을 얻는 것입니다(이 데모).</p>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>셰이딩을 "원래 노멀"로 바꿔 보세요. 표면이 출렁이는데 명암은 매끈한 구 그대로라 납작해 보입니다.</li>
+    <li>"노멀을 색으로"는 셰이더 디버깅의 기본입니다. 방향 (x, y, z)가 (R, G, B)로 보입니다.</li>
+    <li>와이어프레임을 켜고 진폭을 크게 하면 정점이 실제로 움직이는 것을 볼 수 있습니다.</li>
+  </ul>
+</div>

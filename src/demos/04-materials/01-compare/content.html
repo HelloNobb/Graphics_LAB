@@ -1,0 +1,21 @@
+<table>
+  <tr><th>재질</th><th>조명 반응</th><th>특징</th></tr>
+  <tr><td><code>MeshBasicMaterial</code></td><td>없음</td><td>지정한 색 그대로 칠합니다. 가장 빠르며 UI, 디버그, 이미 빛이 구워진 텍스처에 씁니다.</td></tr>
+  <tr><td><code>MeshLambertMaterial</code></td><td>난반사만</td><td>빛을 모든 방향으로 고르게 퍼뜨리는 무광 표면입니다. 하이라이트(반짝임)가 없습니다.</td></tr>
+  <tr><td><code>MeshPhongMaterial</code></td><td>난반사 + 정반사</td><td><code>shininess</code>로 하이라이트 크기를 조절하는 고전 모델입니다. 플라스틱처럼 보이기 쉽습니다.</td></tr>
+  <tr><td><code>MeshStandardMaterial</code></td><td>물리 기반(PBR)</td><td><code>roughness</code>(거칠기)와 <code>metalness</code>(금속성) 두 값으로 실제 재료처럼 보이게 합니다. 에너지 보존을 지켜 어떤 조명에서도 자연스럽습니다.</td></tr>
+</table>
+<p>밝기 계산의 핵심은 <strong>람베르트 코사인 법칙</strong>입니다. 표면 노멀 <code>N</code>과 빛 방향 <code>L</code>이 나란할수록 밝습니다.</p>
+<p class="formula">난반사 = 색 × 빛 × max(0, N · L)</p>
+<p>Phong은 여기에 <strong>정반사</strong>를 더합니다. 빛이 반사된 방향 <code>R</code>과 눈 방향 <code>V</code>가 가까울수록 밝은 점(하이라이트)이 생깁니다.</p>
+<p class="formula">정반사 = 빛 × max(0, R · V)<sup>shininess</sup></p>
+<p>Standard(PBR)는 표면이 미세한 거울 조각(마이크로패싯)들로 이루어졌다고 보고, 그 조각들이 얼마나 제각각인지(거칠기)를 통계적으로 계산합니다. 다음 데모에서 자세히 봅니다.</p>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>Phong shininess를 2와 300으로 바꿔 보세요. 하이라이트가 넓고 흐릿해졌다가 작고 날카로워집니다.</li>
+    <li>Standard의 금속성을 1로 올리면 거의 검게 보입니다. 금속은 주변 환경을 반사하는데, 이 씬에는 반사할 환경이 없기 때문입니다(4-2와 8장 참고).</li>
+    <li>"점광원 움직이기"를 켜고 Lambert와 Phong의 차이를 보세요. Lambert에는 반짝이는 점이 없습니다.</li>
+  </ul>
+</div>

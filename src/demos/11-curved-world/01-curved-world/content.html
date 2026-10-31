@@ -1,0 +1,34 @@
+<p>원리는 한 줄입니다. 정점의 월드 위치에서 <strong>카메라까지의 수평 거리 d</strong>를 구하고, <strong>d²에 비례해 아래로</strong> 내립니다.</p>
+<p class="formula">y' = y − k · d²&nbsp;&nbsp;&nbsp;&nbsp;(구형: d² = dx² + dz², 원통형: d² = dz²)</p>
+<p>왜 제곱일까요? 반지름 R인 구 위에서 거리 d만큼 떨어진 지점은 대략 d²/(2R)만큼 아래에 있습니다(포물선 근사). 그래서 k = 1/(2R)로 두면 <strong>반지름 R인 행성</strong>처럼 보입니다.
+k가 클수록 작은 행성이 됩니다. 원통형(z 방향으로만)은 앞뒤로만 굴러가는 통나무 위 느낌이 납니다. 같은 방식으로 x를 d²만큼 밀면 길이 옆으로 휘어집니다.</p>
+<p>Three.js의 기존 재질(Standard 등)을 그대로 쓰면서 셰이더 일부만 바꾸려면 <code>onBeforeCompile</code>로 셰이더 코드에 끼워 넣습니다.</p>
+<pre><code>material.onBeforeCompile = (shader) =&gt; {
+  shader.uniforms.uCurve = curveUniform;      // 모든 재질이 같은 uniform 객체 공유
+  shader.uniforms.uOrigin = originUniform;    // 메인 카메라 위치
+  shader.vertexShader = 'uniform float uCurve; uniform vec3 uOrigin;\n' +
+    shader.vertexShader.replace('#include &lt;begin_vertex&gt;', `
+      #include &lt;begin_vertex&gt;
+      vec4 wp = modelMatrix * vec4(transformed, 1.0);   // (인스턴싱이면 instanceMatrix도)
+      vec3 d = wp.xyz - uOrigin;
+      vec3 offset = vec3(0.0, -uCurve * dot(d.xz, d.xz), 0.0);
+      transformed += inverse(mat3(modelMatrix)) * offset; // 월드 오프셋 → 로컬로 되돌려 적용
+    `);
+};</code></pre>
+<p><code>transformed</code>(로컬 위치)를 직접 바꾸기 때문에, 뒤따르는 그림자 좌표와 안개 같은 계산도 모두 휜 위치를 기준으로 맞게 이루어집니다.</p>
+<h4>함정 두 가지</h4>
+<ul>
+  <li><strong>그림자</strong>: 그림자는 광원 시점에서 별도의 깊이 재질로 그립니다. 그 재질도 똑같이 휘지 않으면 휘기 전 위치의 그림자가 생깁니다.
+  그래서 <code>customDepthMaterial</code>에도 같은 코드를 넣습니다. 이때 거리 기준은 광원 카메라가 아니라 <strong>메인 카메라 위치(uOrigin)</strong>여야 합니다.</li>
+  <li><strong>절두체 컬링</strong>: Three.js는 휘기 <em>전</em>의 바운딩 구로 "화면 밖이면 그리지 않기"를 판단합니다. 옆으로 크게 휘면 원래는 화면 밖이던 물체가 화면 안으로 들어오는데,
+  이미 컬링되어 깜빡이며 사라집니다. <code>frustumCulled = false</code>로 끄거나 바운딩 구를 넉넉히 키워야 합니다.</li>
+</ul>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>강도를 0.004에서 0.02로 올려 보세요. 행성이 작아지며 지평선이 바짝 다가옵니다.</li>
+    <li>"그림자도 휘기"를 끄면 집과 나무의 그림자가 엉뚱한 위치(휘기 전 위치)에 생깁니다.</li>
+    <li>옆으로 휘기를 0.01로 올리고 "frustumCulled"를 켜 보세요. 왼쪽이나 오른쪽 끝의 집들이 갑자기 나타났다 사라집니다.</li>
+  </ul>
+</div>

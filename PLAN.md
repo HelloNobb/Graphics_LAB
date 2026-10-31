@@ -1,5 +1,11 @@
 # 그래픽스 실험실 — 구현 계획 (PLAN.md)
 
+> **상태: Phase 0~6 구현 완료.** 29개 데모 전부 스모크 테스트 통과 (데스크톱·모바일 에뮬레이션).
+> 구현 중 바뀐 점: three r186에서 `PCFSoftShadowMap`이 제거되어 그림자 타입은 Basic/PCF/VSM만 다룹니다.
+> 데스크톱 GUI는 캔버스 위에 겹치지 않고 오른쪽 열에 둡니다(컨테이너 폭 820px 이하면 캔버스 아래).
+> 데스크톱에서는 캔버스를 한 번 클릭해야 휠 줌이 켜집니다(페이지 스크롤 중 의도치 않은 줌 방지).
+> three와 lil-gui는 첫 데모가 다가올 때 동적으로 로드해서 첫 페이지 JS는 약 27KB입니다.
+
 Three.js(`WebGLRenderer`) + Vite로 만드는 정적 학습 사이트입니다.
 카테고리별 섹션마다 **한국어 개념 설명 → 인터랙티브 데모 캔버스 → lil-gui 파라미터 조절** 순서로 구성하고,
 GitHub Actions로 GitHub Pages에 자동 배포합니다.
@@ -62,8 +68,8 @@ GitHub Actions로 GitHub Pages에 자동 배포합니다.
 ├─ package.json
 ├─ PLAN.md / README.md
 ├─ .github/workflows/deploy.yml      # GitHub Pages 배포
-├─ scripts/new-demo.mjs              # 데모 폴더 스캐폴딩: npm run new-demo -- 05-lights spot-detail
-├─ tests/smoke.spec.js               # 전체 스크롤, 콘솔 에러·활성 컨텍스트 수 검사
+├─ scripts/new-demo.mjs              # 데모 폴더 스캐폴딩 (scripts/demo-template 복사): npm run new-demo -- 05-lights spot-detail
+├─ scripts/smoke.cjs                 # 전체 스크롤, 콘솔 에러·활성 컨텍스트 수 검사 (npm run smoke)
 ├─ public/favicon.svg
 └─ src/
    ├─ main.js                        # 레지스트리 → 섹션 DOM 생성 → DemoManager 시작
@@ -98,7 +104,6 @@ GitHub Actions로 GitHub Pages에 자동 배포합니다.
       │     ├─ gerstner.js           # CPU 측 동일 공식 (부표를 띄우는 용도)
       │     ├─ ocean.vert.glsl
       │     └─ ocean.frag.glsl
-      └─ _template/                  # new-demo 스크립트가 복사하는 템플릿
 ```
 
 **정렬 규칙:** 폴더 이름의 숫자 접두사 순서대로 정렬합니다. 카테고리를 추가하려면 폴더를 하나 만들면 되고, 데모를 추가하려면 하위 폴더를 하나 만들면 됩니다.
@@ -182,7 +187,7 @@ export function create({ renderer, canvas, container, gui, params, quality, trac
 | 5-1 | 조명 종류 비교 | Ambient/Hemisphere/Directional/Point/Spot을 개별 on/off. 각 Helper 표시 | 종류별 on/off·강도·색, Spot 각도·penumbra, Point distance·decay, 헬퍼 표시 |
 
 ### 06. 그림자
-| 6-1 | 섀도우맵 기본 | castShadow/receiveShadow, 섀도우 타입 비교 | 타입(Basic/PCF/PCFSoft/VSM), 광원 위치, 그림자 카메라 헬퍼 |
+| 6-1 | 섀도우맵 기본 | castShadow/receiveShadow, 섀도우 타입 비교 | 타입(Basic/PCF/VSM — r186에서 PCFSoft는 제거되어 PCF의 radius로 대체), 광원 종류, 그림자 카메라 헬퍼 |
 | 6-2 | 아티팩트 실험실 | 해상도, 바이어스, 절두체 크기에 따른 계단 현상·shadow acne·peter-panning 재현 | mapSize 128~4096, bias, normalBias, 절두체 크기, "acne 재현"/"peter-panning 재현" 프리셋 |
 
 ### 07. 텍스처
@@ -243,17 +248,17 @@ export function create({ renderer, canvas, container, gui, params, quality, trac
 
 각 단계가 끝날 때마다 `npm run build`가 통과하는지와 Playwright 스모크 테스트를 확인한 뒤 커밋하고 push합니다.
 
-1. **Phase 0 — 스캐폴딩과 배포 파이프라인**
+1. ✅ **Phase 0 — 스캐폴딩과 배포 파이프라인**
    Vite 프로젝트, 의존성 고정, `index.html`·CSS 뼈대, `deploy.yml`, README. 빈 페이지라도 **먼저 배포해서 Pages 경로 문제를 일찍 확인**합니다.
-2. **Phase 1 — 코어 프레임워크** (가장 중요)
+2. ✅ **Phase 1 — 코어 프레임워크** (가장 중요)
    `registry` → `DemoHost` → `DemoManager`(IO, 상한, LRU, 유예, 포스터) → `gui`, `touchGuard`, `statsOverlay`, `dispose`, `device` → `_template`과 `new-demo` 스크립트.
    데모 1-1 하나로 검증: 스크롤 진입/이탈 때 생성·해제, 컨텍스트 수, GUI 값 보존, 모바일 터치 가드.
    스모크 테스트를 작성합니다: 전 구간을 스크롤하며 `console.error`가 0건인지, 동시 활성 캔버스 수가 상한 이하인지 검사.
-3. **Phase 2 — 기본기 ①** 카테고리 01~03 (데모 8개) + `shared/textures.js`
-4. **Phase 3 — 기본기 ②** 카테고리 04~08 (데모 10개) + `shared/environment.js`
-5. **Phase 4 — 셰이더 응용** 09 → 10 → 11 → 12 (데모 5개) + `shared/glsl/noise.glsl`
-6. **Phase 5 — 대량 렌더링과 후처리** 13 → 14 → 15 → 16 (데모 6개)
-7. **Phase 6 — 마감**
+3. ✅ **Phase 2 — 기본기 ①** 카테고리 01~03 (데모 8개) + `shared/textures.js`
+4. ✅ **Phase 3 — 기본기 ②** 카테고리 04~08 (데모 10개) + `shared/environment.js`
+5. ✅ **Phase 4 — 셰이더 응용** 09 → 10 → 11 → 12 (데모 5개) + `shared/glsl/noise.glsl`
+6. ✅ **Phase 5 — 대량 렌더링과 후처리** 13 → 14 → 15 → 16 (데모 6개)
+7. ✅ **Phase 6 — 마감**
    목차 드로어, 현재 섹션 하이라이트, 설명 문구 다듬기, 모바일 뷰포트(375px) Playwright 스크린샷 점검, 저사양 품질 프리셋 튜닝, README(로컬 실행 방법, 데모 추가 방법).
 
 ---

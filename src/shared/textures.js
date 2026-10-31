@@ -198,19 +198,23 @@ export function toonGradient(steps = 3) {
   return t;
 }
 
-/** 캔버스를 박스 위에 작은 썸네일로 띄우기 (설명용) */
-export function thumbnail(ctx, canvas, caption, style) {
+/** 캔버스를 박스 오른쪽 아래에 작은 썸네일로 띄우기 (설명용) */
+export function thumbnail(ctx, canvas, caption) {
+  let row = ctx.stage.querySelector('.demo-thumbs');
+  if (!row) {
+    row = document.createElement('div');
+    row.className = 'demo-thumbs';
+    ctx.stage.appendChild(row);
+    ctx.onDispose(() => row.remove());
+  }
   const el = document.createElement('figure');
   el.className = 'demo-thumb';
   const img = new Image();
   img.src = canvas.toDataURL();
   img.alt = caption;
-  el.append(img);
   const cap = document.createElement('figcaption');
   cap.textContent = caption;
-  el.append(cap);
-  Object.assign(el.style, style);
-  ctx.stage.appendChild(el);
-  ctx.onDispose(() => el.remove());
+  el.append(img, cap);
+  row.appendChild(el);
   return el;
 }

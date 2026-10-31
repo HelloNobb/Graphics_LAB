@@ -1,0 +1,35 @@
+<p>화면을 꽉 채우는 사각형 하나를 그리고, 프래그먼트 셰이더에서 <strong>각 픽셀의 좌표(uv)만 가지고</strong> 색을 계산해 봅시다.
+수십만 개의 픽셀이 <strong>동시에, 서로를 모른 채</strong> 같은 함수를 실행합니다. 셰이더 프로그래밍은 "이 픽셀 하나의 색은 좌표의 어떤 함수인가?"를 생각하는 일입니다.</p>
+<pre><code>// fragment shader
+uniform float uTime;
+uniform vec3 uColorA, uColorB;
+varying vec2 vUv;               // 버텍스 셰이더가 넘겨준 0~1 좌표
+
+void main() {
+  float v = vUv.x;                                   // 그라디언트
+  // float v = step(0.5, fract(vUv.x * 10.0));       // 줄무늬
+  // float v = 0.5 + 0.5 * sin(length(vUv - 0.5) * 40.0 - uTime * 3.0); // 동심원
+  gl_FragColor = vec4(mix(uColorA, uColorB, v), 1.0);
+}</code></pre>
+<p>셰이더에서 자주 쓰는 내장 함수를 알아 두면 좋습니다.</p>
+<ul>
+  <li><code>fract(x)</code>: 소수 부분 → 반복 패턴</li>
+  <li><code>step(edge, x)</code>: x가 edge 이상이면 1, 아니면 0 → 딱 끊기는 경계</li>
+  <li><code>smoothstep(a, b, x)</code>: a~b 사이에서 0→1로 부드럽게 → 부드러운 경계</li>
+  <li><code>mix(a, b, t)</code>: a와 b를 t 비율로 섞기</li>
+  <li><code>length</code>, <code>sin</code>, <code>noise</code>: 원, 물결, 자연스러운 무작위</li>
+</ul>
+<pre><code>const material = new THREE.ShaderMaterial({
+  uniforms: { uTime: { value: 0 }, uColorA: { value: new THREE.Color('#0b1d51') } },
+  vertexShader, fragmentShader,
+});
+// 렌더 루프: material.uniforms.uTime.value = elapsed;</code></pre>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>"줄무늬"에서 주파수를 올리면 줄이 촘촘해집니다. <code>fract(uv.x × 주파수)</code>의 결과입니다.</li>
+    <li>"노이즈 (fBm)"는 크기가 다른 노이즈를 여러 겹 더한 것입니다. 구름이나 대리석, 지형이 대부분 이 방식으로 만들어집니다.</li>
+    <li>픽셀이 몇백만 개여도 60fps가 나옵니다. GPU가 픽셀들을 병렬로 계산하기 때문입니다.</li>
+  </ul>
+</div>

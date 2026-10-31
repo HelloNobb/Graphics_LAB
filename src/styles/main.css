@@ -15,7 +15,8 @@
   --radius: 12px;
   --header-h: 56px;
   --toc-w: 264px;
-  --content-w: 880px;
+  --content-w: 1180px;
+  --prose-w: 760px;
   --gutter: 16px;
   --font: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
   --mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, 'D2Coding', monospace;
@@ -294,6 +295,7 @@ main > * {
 /* ── 데모 블록 ────────────────────────── */
 .demo {
   padding: 40px 0 32px;
+  container-type: inline-size;
 }
 .demo + .demo {
   border-top: 1px dashed var(--line);
@@ -314,6 +316,12 @@ main > * {
 }
 
 /* 본문 */
+.prose,
+.category__intro,
+.hero__lead,
+.hero__notes {
+  max-width: var(--prose-w);
+}
 .prose > :first-child {
   margin-top: 0;
 }
@@ -427,6 +435,10 @@ main > * {
 .demo-box {
   position: relative;
   margin: 20px 0 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 12px;
+  align-items: start;
 }
 .demo-stage {
   --poster: none;
@@ -578,9 +590,9 @@ main > * {
   inset: 0;
   z-index: 3;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-bottom: 36px;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 8px;
   border: 0;
   background: transparent;
   font: inherit;
@@ -607,17 +619,15 @@ main > * {
   outline-offset: -2px;
 }
 
-/* lil-gui: 데스크톱은 캔버스 위 오른쪽 상단에 겹쳐서 */
+/* lil-gui: 넓은 화면은 캔버스 오른쪽 열, 좁은 화면은 캔버스 아래 */
 .demo-gui {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 6;
-  max-height: calc(100% - 16px);
+  min-width: 0;
+  max-height: 78vh;
+  max-height: 78svh;
   display: flex;
 }
 .demo-gui .lil-gui.root {
-  --background-color: rgb(16 18 23 / 0.9);
+  --background-color: var(--bg-elev);
   --widget-color: #262b35;
   --hover-color: #303644;
   --focus-color: #3a4252;
@@ -628,14 +638,32 @@ main > * {
   --font-size: 12px;
   --input-font-size: 12px;
   --widget-height: 22px;
-  --name-width: 44%;
-  width: 270px;
+  --name-width: 46%;
+  width: 100%;
   max-height: 100%;
   overflow-y: auto;
   overscroll-behavior: contain;
-  border-radius: 8px;
-  backdrop-filter: blur(6px);
+  border: 1px solid var(--line);
+  border-radius: 10px;
   scrollbar-width: thin;
+}
+.demo-tip {
+  grid-column: 1 / -1;
+}
+@container (max-width: 820px) {
+  .demo-box {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .demo-gui {
+    max-height: none;
+  }
+  .demo-gui .lil-gui.root {
+    max-height: none;
+    --widget-height: 26px;
+    --font-size: 13px;
+    --input-font-size: 14px;
+  }
 }
 
 /* ── 푸터 ─────────────────────────────── */
@@ -701,19 +729,6 @@ main > * {
     aspect-ratio: var(--aspect-m, 1.3333);
     max-height: 70svh;
   }
-  /* 모바일: GUI는 캔버스를 가리지 않도록 아래에 */
-  .demo-gui {
-    position: static;
-    max-height: none;
-    margin-top: 8px;
-  }
-  .demo-gui .lil-gui.root {
-    width: 100%;
-    --widget-height: 28px;
-    --font-size: 13px;
-    --input-font-size: 14px;
-    max-height: none;
-  }
   .has-zoom-guard::after {
     display: none;
   }
@@ -729,9 +744,16 @@ main > * {
 }
 
 /* 데모 안 썸네일 (텍스처 미리보기 등) */
-.demo-thumb {
+.demo-thumbs {
   position: absolute;
   z-index: 2;
+  right: 8px;
+  bottom: 26px;
+  display: flex;
+  gap: 6px;
+  pointer-events: none;
+}
+.demo-thumb {
   margin: 0;
   pointer-events: none;
   padding: 4px;
@@ -753,4 +775,31 @@ main > * {
     width: 48px;
     height: 48px;
   }
+}
+
+/* 전/후 비교선 */
+.demo-divider {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  border-left: 2px solid rgb(255 255 255 / 0.7);
+  pointer-events: none;
+}
+.demo-divider span {
+  position: absolute;
+  top: 8px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgb(0 0 0 / 0.55);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.demo-divider span:first-child {
+  right: 10px;
+}
+.demo-divider span:last-child {
+  left: 10px;
 }

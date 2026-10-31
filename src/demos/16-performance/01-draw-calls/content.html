@@ -1,0 +1,21 @@
+<p><strong>드로우콜</strong>은 CPU가 GPU에 "이 지오메트리를 이 재질로 그려"라고 보내는 명령 하나입니다. 명령마다 셰이더와 버퍼와 uniform을 준비하는 고정 비용이 있어서,
+작은 물체 1만 개를 따로 그리는 것이 큰 물체 하나를 그리는 것보다 훨씬 느립니다. 삼각형 수가 같아도 그렇습니다.</p>
+<table>
+  <tr><th>방식</th><th>드로우콜</th><th>장점</th><th>단점</th></tr>
+  <tr><td>개별 <code>Mesh</code> N개</td><td>N</td><td>각자 자유롭게 움직이고, 추가하고, 삭제할 수 있음</td><td>수천 개부터 CPU 병목</td></tr>
+  <tr><td>병합 <code>mergeGeometries</code></td><td>1</td><td>가장 빠름. 재질이 달라도 정점 색으로 처리 가능</td><td>합친 뒤에는 <strong>개별로 움직일 수 없음</strong>. 정적인 배경(건물, 바위)에 적합</td></tr>
+  <tr><td><code>InstancedMesh</code></td><td>1</td><td>같은 모양 N개를 각자 다른 행렬로. 개별 이동 가능</td><td>모양이 모두 같아야 함. 움직일 때는 행렬 배열을 다시 올려야 함</td></tr>
+</table>
+<pre><code>import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+const parts = cubes.map((c) =&gt; box.clone().applyMatrix4(c.matrix));
+const merged = new THREE.Mesh(mergeGeometries(parts), material); // 드로우콜 1</code></pre>
+<p class="note">재질이 다르면 드로우콜이 나뉩니다. 그래서 텍스처 여러 장을 한 장에 모은 <strong>텍스처 아틀라스</strong>를 써서 재질 수 자체를 줄이기도 합니다. 최근 Three.js에는 서로 다른 지오메트리를 한 번에 그리는 <code>BatchedMesh</code>도 있습니다.</p>
+<!--demo-->
+<div class="try">
+  <h4>해볼 것</h4>
+  <ul>
+    <li>개수를 8000으로 두고 "개별 Mesh"와 "InstancedMesh"를 비교해 보세요. render() 시간이 크게 다릅니다.</li>
+    <li>"병합"에서 움직임을 켜면 전체가 통째로만 돕니다. 개별 큐브는 움직일 수 없습니다.</li>
+    <li>"InstancedMesh"에서 움직임을 켜면 JS 업데이트 시간(행렬 계산)이 늘어납니다. 그래도 드로우콜은 1입니다.</li>
+  </ul>
+</div>

@@ -71,7 +71,13 @@ function startServer() {
     if (!ok) failed.push(id);
     console.log(`${ok ? '✓' : '✗'} ${id.padEnd(8)} state=${info.state} active=${info.active} ${info.stats}`);
     newErr.forEach((e) => console.log('    ', e.slice(0, 400)));
-    if (shots) await page.$eval(`#${id} .demo-box`, () => 0).then(() => page.locator(`#${id} .demo-box`).screenshot({ path: `screenshots/${id}${mobile ? '-m' : ''}.png` }));
+    if (shots) {
+      const box = await page.$eval(`#${id} .demo-box`, (el) => {
+        const r = el.getBoundingClientRect();
+        return { x: r.x, y: r.y, width: r.width, height: Math.min(r.height, window.innerHeight - r.y) };
+      });
+      await page.screenshot({ path: `screenshots/${id}${mobile ? '-m' : ''}.png`, clip: box, timeout: 120000 }).catch((e) => console.log('    (스크린샷 실패)', e.message.split('\n')[0]));
+    }
   }
   const cap = await page.evaluate(() => window.__lab && window.__lab.manager.hosts.length);
   console.log(`\n최대 동시 활성: ${peak}  (전체 ${cap})`);
